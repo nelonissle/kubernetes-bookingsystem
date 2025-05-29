@@ -1,0 +1,299 @@
+services:
+  authservice-migration:
+    build:
+      context: ./AuthService
+      dockerfile: Dockerfile-migration
+    image: authservice-migration:latest
+    container_name: AuthService-Migration
+    env_file:
+      - .env
+    volumes:
+      - auth_data:/app/data
+      - log_data:/app/logs
+    networks:
+      - skybooker_network
+    restart: "no" # Run only once and exit
+
+  authservice:
+    build:
+      context: ./AuthService
+      dockerfile: Dockerfile
+    image: authservice:latest
+    container_name: AuthService
+    env_file:
+      - .env
+    ports:
+      - "8003:8080"
+    environment:
+      - CONTAINER_NAME=AuthService
+    volumes:
+      - auth_data:/app/data
+      - log_data:/app/logs
+    networks:
+      - skybooker_network
+    depends_on:
+      authservice-migration:
+        condition: service_completed_successfully
+
+  flightservice:
+    build:
+      context: ./FlightService
+      dockerfile: Dockerfile
+    image: flightservice:latest
+    container_name: FlightService
+    env_file:
+      - .env
+    ports:
+      - "8001:8080"
+    environment:
+      - CONTAINER_NAME=FlightService
+      - MONGO_SERVICE_HOST=mymongo
+    volumes:
+      - log_data:/app/logs
+    networks:
+      - skybooker_network
+    restart: always
+    depends_on:
+      - mongo
+
+  bookingservice-migration:
+    build:
+      context: ./BookingService
+      dockerfile: Dockerfile-migration
+    image: bookingservice-migration:latest
+    container_name: BookingService-Migration
+    env_file:
+      - .env
+    environment:
+      - CONTAINER_NAME=BookingService
+      - MARIADB_SERVICE_HOST=mariadb
+      - RABBITMQ_SERVICE_HOST=rabbitmq
+      - FLIGHTSERVICE_SERVICE_HOST=flightservice
+      - OCELOTAPIGATEWAY_SERVICE_HOST=ocelotapigateway
+      - OCELOTAPIGATEWAY_SERVICE_PORT=8080
+    volumes:
+      - log_data:/app/logs
+    networks:
+      - skybooker_network
+    restart: "no" # Run only once and exit
+    depends_on:
+      mariadb:
+        condition: service_healthy
+
+  bookingservice:
+    build:
+      context: ./BookingService
+      dockerfile: Dockerfile
+    image: bookingservice:latest
+    container_name: BookingService
+    env_file:
+      - .env
+    ports:
+      - "8002:8080"
+    environment:
+      - CONTAINER_NAME=BookingService
+      - MARIADB_SERVICE_HOST=mariadb
+      - RABBITMQ_SERVICE_HOST=rabbitmq
+      - FLIGHTSERVICE_SERVICE_HOST=flightservice
+      - OCELOTAPIGATEWAY_SERVICE_HOST=ocelotapigateway
+      - OCELOTAPIGATEWAY_SERVICE_PORT=8080
+    volumes:
+      - log_data:/app/logs
+    depends_on:
+      mariadb:
+        condition: service_started
+      authservice:
+        condition: service_started
+      bookingservice-migration:
+        condition: service_completed_successfully
+    networks:
+      - skybooker_network
+
+  ocelotapigateway:
+    container_name: OcelotApiGateway
+    build:
+      context: ./OcelotApiGateway
+      dockerfile: Dockerfile
+    image: ocelotapigateway:latest
+    ports:
+      - "8000:8080"
+    volumes:
+      - log_data:/app/logs
+    env_file:
+      - .env
+    environment:
+      - CONTAINER_NAME=OcelotApiGateway
+      - AUTHSERVICE_SERVICE_HOST=authservice
+      - FLIGHTSERVICE_SERVICE_HOST=flightservice
+      - BOOKINGSERVICE_SERVICE_HOST=bookingservice
+      - MESSAGINGSERVICE_SERVICE_HOST=messagingservice
+    depends_on:
+      - authservice
+      - bookingservice
+      - flightservice
+    networks:
+      - skybooker_network
+
+  messagingservice:
+    container_name: MessagingService
+    build:
+      context: ./MessagingService
+      dockerfile: Dockerfile
+    image: messagingservice:latest
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    ports:
+      - "8004:8080"
+    env_file:
+      - .env
+    environment:
+      - CONTAINER_NAME=MessagingService
+      - RABBITMQ_SERVICE_HOST=rabbitmq
+    volumes:
+      - log_data:/app/logs
+    networks:
+      - skybooker_network
+    restart: always
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - skybooker_network
+
+  mongo:
+    image: mongo:latest
+    container_name: mymongo
+    env_file:
+      - .env
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - skybooker_network
+    restart: always
+
+  mariadb:
+    image: mariadb:11
+    container_name: mariadb
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - skybooker_network
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./Monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - skybooker_network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+      - loki
+    networks:
+      - skybooker_network
+
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./Monitoring/loki-config.yaml:/etc/loki/local-config.yaml
+      - loki_data:/tmp/loki
+      - lokiwal_data:/wal
+    command: -config.file=/etc/loki/local-config.yaml -config.expand-env=true
+    depends_on:
+      - promtail
+    networks:
+    - skybooker_network
+
+  promtail:
+    image: grafana/promtail:latest
+    container_name: promtail
+    volumes:
+      - ./Monitoring/promtail-config.yaml:/etc/promtail/config.yaml
+      - /var/log:/var/log
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - log_data:/app/logs:ro
+    command: -config.file=/etc/promtail/config.yaml
+    networks:
+    - skybooker_network
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.6.0
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - xpack.security.enabled=false
+      #- ELASTIC_PASSWORD=elastic  # Set your desired password here
+    ports:
+      - "9200:9200"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    networks:
+      - skybooker_network
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.6.0
+    container_name: logstash
+    volumes:
+      - ./Monitoring/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+      - log_data:/app/logs:ro
+    ports:
+      - "5000:5000"
+    networks:
+      - skybooker_network
+    depends_on:
+      - elasticsearch
+
+networks:
+  skybooker_network:
+    driver: bridge
+
+volumes:
+  grafana_data:
+  es_data:
+  mongo_data:
+  mariadb_data:
+  loki_data:
+  lokiwal_data:
+  log_data:
+  auth_data:

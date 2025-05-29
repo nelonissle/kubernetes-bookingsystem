@@ -1,0 +1,42 @@
+#
+# SykBooker environment settings
+#
+
+# AuthService
+# JWT main key
+JWTROOTTOKEN='skybooker_example_128sdofODSFJaoskdjf2983jlsdfoer238342985AFkjsdfjla93829832kfjdsfjsdkfj83392'
+# SQLITE
+SQLITE_CONNECTION='Data Source=file:data/AuthService.db'
+AUTH_ADMIN_PWD='Default$Admin359_admin'
+
+# BookingService
+# Maria DB Server
+MARIADB_SERVICE_HOST=localhost
+MARIADB_DATABASE=BookingDB
+MARIADB_USER=skybooker
+MARIADB_PASSWORD='123456SkyBit_01abc'
+MARIADB_ROOT_PASSWORD='123456SkyBit_01abc'
+
+# FlightService
+# MongoDB
+MONGO_SERVICE_HOST=localhost
+MONGO_PASSWORD='123456SkyBit_01abc'
+MONGO_INITDB_ROOT_PASSWORD='123456SkyBit_01abc'
+MONGO_INITDB_ROOT_USERNAME=mongoadmin
+MONGO_DATABASE_NAME=FlightDB
+
+# MessagingService
+# Twilio - whatsapp service api
+TWILIO_ACCOUNTSID='id'
+TWILIO_AUTHTOKEN='token'
+TWILIO_PHONE_NUMBER='+4111111'
+MESSAGING_DESTINATIONPHONE='+4111111'
+# Rabbit MQ 
+RABBITMQ_SERVICE_HOST=localhost
+RABBITMQ_DEFAULT_USER=guest
+RABBITMQ_DEFAULT_PASS='guest'
+
+# Monitoring
+GRAFANA_ADMIN_PASSWORD='123456SkyBit_01abc'
+GF_SECURITY_ADMIN_PASSWORD='123456SkyBit_01abc'
+

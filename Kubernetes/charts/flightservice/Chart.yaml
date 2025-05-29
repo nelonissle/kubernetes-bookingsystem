@@ -1,0 +1,4 @@
+apiVersion: v2
+name: flightservice
+version: 0.1.0
+description: Flightservice microservice chart

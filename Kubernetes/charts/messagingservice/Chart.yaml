@@ -1,0 +1,4 @@
+apiVersion: v2
+name: messagingservice
+version: 0.1.0
+description: Messagingservice microservice chart

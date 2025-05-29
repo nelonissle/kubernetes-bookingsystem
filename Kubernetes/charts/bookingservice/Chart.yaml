@@ -1,0 +1,4 @@
+apiVersion: v2
+name: bookingservice
+version: 0.1.0
+description: Bookingservice microservice chart

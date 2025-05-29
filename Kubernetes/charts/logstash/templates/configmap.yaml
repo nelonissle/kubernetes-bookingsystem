@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: logstash-config
+  namespace: skybooker
+data:
+  logstash.conf: |
+    input {
+      file {
+        path => "/app/logs/*.log"
+        start_position => "beginning"
+        sincedb_path => "/dev/null"
+      }
+    }
+
+    filter {
+      # Optional: Add parsing or enrichment filters here
+    }
+
+    output {
+      elasticsearch {
+        hosts => ["http://elasticsearch:9200"]
+        index => "myapp-logs"
+        user => "elastic"
+        password => "elastic"
+      }
+      stdout { codec => rubydebug }
+    }

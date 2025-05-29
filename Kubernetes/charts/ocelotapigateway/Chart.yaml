@@ -1,0 +1,4 @@
+apiVersion: v2
+name: ocelotapigateway
+version: 0.1.0
+description: Ocelotapigateway microservice chart

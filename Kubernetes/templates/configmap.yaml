@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: global-config
+  namespace: skybooker
+data:
+  IMAGE_PULL_POLICY: "IfNotPresent"
+  LOG_PATH: "/app/logs"
+  DATA_PATH: "/app/data"
+ 
+  SQLITE_CONNECTION: "Data Source=file:data/AuthService.db"
+
+  MARIADB_DATABASE: "BookingDB"
+  MARIADB_USER: "skybooker"
+
+  MONGO_USERNAME: "mongoadmin"
+  MONGO_INITDB_ROOT_USERNAME: "mongoadmin"
+  MONGO_DATABASE_NAME: "FlightDb"
+
+  RABBITMQ_DEFAULT_USER: "guest"
+
+  FLIGHTSERVICE_PORT: "8001"
+  BOOKINGSERVICE_PORT: "8002"
+  AUTHSERVICE_PORT: "8003"
+  OCELOTAPIGATEWAY_PORT: "8000"
+  MESSAGINGSERVICE_PORT: "8004"

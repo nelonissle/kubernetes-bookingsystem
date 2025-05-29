@@ -1,0 +1,4 @@
+apiVersion: v2
+name: loki
+version: 0.1.0
+description: Loki microservice chart

@@ -1,0 +1,4 @@
+apiVersion: v2
+name: bookingservice-migration
+version: 0.1.0
+description: Bookingservice microservice migration chart

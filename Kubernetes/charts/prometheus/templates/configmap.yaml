@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: skybooker
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+
+    scrape_configs:
+      - job_name: 'ocelot'
+        metrics_path: /metrics
+        static_configs:
+          - targets: ['ocelotapigateway:8080']
+      - job_name: 'messagingservice'
+        metrics_path: /metrics
+        static_configs:
+          - targets: ['messagingservice:8080']
+      - job_name: 'authservice'
+        metrics_path: /metrics
+        static_configs:
+          - targets: ['authservice:8080']
+      - job_name: 'bookingservice'
+        metrics_path: /metrics
+        static_configs:
+          - targets: ['bookingservice:8080']
+      - job_name: 'flightservice'
+        metrics_path: /metrics
+        static_configs:
+          - targets: ['FlightService:8080']

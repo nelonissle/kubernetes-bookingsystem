@@ -1,0 +1,24 @@
+{
+   "sqltools.connections": [
+      {
+         "mysqlOptions": {
+            "authProtocol": "default",
+            "enableSsl": "Disabled"
+         },
+         "previewLimit": 50,
+         "server": "localhost",
+         "port": 3306,
+         "driver": "MariaDB",
+         "name": "skybooker",
+         "database": "BookingDB",
+         "username": "root"
+      },
+      {
+         "previewLimit": 50,
+         "driver": "SQLite",
+         "name": "skybooker-auth",
+         "database": "${workspaceFolder:kubernetes-bookingsystem-private}/SkyBooker/AuthService/data/AuthService.db"
+      }
+   ],
+   "sqltools.useNodeRuntime": true
+}

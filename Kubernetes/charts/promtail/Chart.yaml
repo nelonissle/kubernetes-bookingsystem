@@ -1,0 +1,4 @@
+apiVersion: v2
+name: promtail
+version: 0.1.0
+description: Promtail microservice chart

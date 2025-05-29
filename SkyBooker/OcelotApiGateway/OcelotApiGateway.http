@@ -1,0 +1,114 @@
+@Ocelot_GatewayAddress = http://localhost:8000
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IkFkbWluVjYiLCJyb2xlIjoiQWRtaW4iLCJuYmYiOjE3NDY1MjQwNDEsImV4cCI6MTc0NzM4ODA0MSwiaWF0IjoxNzQ2NTI0MDQxfQ.8cI9DDIkEFCRjbfM59_nwBv8lbGQ2bbe-uB2hEiC_OE
+
+### Register User Test via Gateway
+POST {{Ocelot_GatewayAddress}}/auth/register
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username": "AdminV7",
+  "eMail": "testuseradmin@example3.com",
+  "password": "ABCDEFG-ab123456",
+  "role": "Admin"
+}
+
+### Login User Test via Gateway
+POST {{Ocelot_GatewayAddress}}/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username": "AdminV5",
+  "password": "ABCDEFG-ab123456"
+}
+
+### Retrieves the Flights via Gateway
+GET {{Ocelot_GatewayAddress}}/flight
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### Retrieves a Flight via Gateway by MongoDB ID
+GET {{Ocelot_GatewayAddress}}/flight/67e189447901432a544bdb4a
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### Retrieves a Flight via Gateway by FlightId
+GET {{Ocelot_GatewayAddress}}/flight/FL199
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### Post new Flight via Gateway
+POST {{Ocelot_GatewayAddress}}/flight/create
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+  "flightId": "FL202",
+  "airlineName": "Sky Airlines",
+  "source": "New York",
+  "destination": "Basel",
+  "departure_Time": "2025-11-22T10:00:00",
+  "arrival_Time": "2025-12-22T14:00:00",
+  "available_Seats": 150,
+  "created_At": "2025-03-21T12:00:00",
+  "updated_At": "2025-03-21T12:00:00"
+}
+
+### Post new Booking via Gateway
+POST {{Ocelot_GatewayAddress}}/booking
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+  "flightId": "FL199",
+  "passengerId": "P26",
+  "passengerFirstname": "john",
+  "passengerLastname": "Doe",
+  "ticketCount": 2
+}
+
+### Update Flightservice via Gateway
+PUT {{Ocelot_GatewayAddress}}/flight/updateSeats/{flightId}
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+ "flightId": "FL222",
+  "airlineName": "Sky Airlines",
+  "source": "New York",
+  "destination": "Los Angeles",
+  "departure_Time": "2025-10-22T10:00:00",
+  "arrival_Time": "2025-11-22T14:00:00",
+  "available_Seats": 170,
+  "created_At": "2025-03-21T12:00:00",
+  "updated_At": "2025-03-21T12:00:00"
+}
+
+### Retrieves the Bookings via Gateway
+GET {{Ocelot_GatewayAddress}}/booking
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### Retrieves a Booking via Gateway by BookingId
+GET {{Ocelot_GatewayAddress}}/booking/3007
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### Send a message via Gateway
+POST {{Ocelot_GatewayAddress}}/send
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###
+
+

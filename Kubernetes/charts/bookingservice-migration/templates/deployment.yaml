@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bookingservice-migration
+  namespace: skybooker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bookingservice-migration
+  template:
+    metadata:
+      labels:
+        app: bookingservice-migration
+    spec:
+      containers:
+        - name: bookingservice-migration
+          image: nelonissle7/kub_bookingmigration:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: booking-config
+            - configMapRef:
+                name: global-config
+            - secretRef:
+                name: skybooker-secrets
+          volumeMounts:
+            - name: logs
+              mountPath: /app/logs
+      volumes:
+        - name: logs
+          hostPath:
+            path: /app/logs
+            type: DirectoryOrCreate

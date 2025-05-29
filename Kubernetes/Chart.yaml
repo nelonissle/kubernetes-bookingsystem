@@ -1,0 +1,4 @@
+apiVersion: v2
+name: skybooker
+description: Umbrella Chart for SkyBooker Microservices
+version: 0.1.0

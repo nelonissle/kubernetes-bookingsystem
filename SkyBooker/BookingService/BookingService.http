@@ -1,0 +1,15 @@
+@BookingService_HostAddress = http://localhost:8002
+
+###
+POST {{BookingService_HostAddress}}/api/booking
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IkvDtm5pZ0FkbWluIiwicm9sZSI6IkFkbWluIiwibmJmIjoxNzQyODM2MjA2LCJleHAiOjE3NDM3MDAyMDYsImlhdCI6MTc0MjgzNjIwNn0.G_DKf_fZ677PA1Gj1r2Yw33ms27_roKm3YKSdRrQbYY
+
+{
+  "flightId": "FL199",
+  "passengerId": "P12345",
+  "passengerFirstname": "John",
+  "passengerLastname": "Doe",
+  "ticketCount": 2
+}

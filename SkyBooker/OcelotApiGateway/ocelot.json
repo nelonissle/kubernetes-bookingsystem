@@ -1,0 +1,91 @@
+{
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/api/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "{{AUTHSERVICE_SERVICE_HOST}}",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/auth/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "DelegatingHandlers": [
+        "OcelotApiGateway.Handlers.LoggingDelegatingHandler"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/admin/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "{{AUTHSERVICE_SERVICE_HOST}}",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/auth/admin/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "DelegatingHandlers": [
+        "OcelotApiGateway.Handlers.LoggingDelegatingHandler"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/flight/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "{{FLIGHTSERVICE_SERVICE_HOST}}",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/flight/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "DelegatingHandlers": [
+        "OcelotApiGateway.Handlers.LoggingDelegatingHandler"
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "JwtBearer"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/booking/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "{{BOOKINGSERVICE_SERVICE_HOST}}",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/booking/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "DelegatingHandlers": [
+        "OcelotApiGateway.Handlers.LoggingDelegatingHandler"
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "JwtBearer"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "{{MESSAGINGSERVICE_SERVICE_HOST}}",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/messaging/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "DelegatingHandlers": [
+        "OcelotApiGateway.Handlers.LoggingDelegatingHandler"
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "JwtBearer"
+      }
+    }
+  ],
+  "GlobalConfiguration": {
+    "BaseUrl": "http://localhost:8000"
+  }
+}

@@ -1,0 +1,125 @@
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: .NET
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    name: build dotnet
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+    
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+      - name: Restore dependencies
+        run: |
+          cd SkyBooker
+          dotnet restore
+      - name: Build
+        run: |
+          cd SkyBooker
+          dotnet build --no-restore
+      - name: Test
+        run: |
+          cd SkyBooker
+          dotnet test --no-build --verbosity normal
+
+  deploy:
+
+    needs:
+      build
+    name: deploy docker
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+      attestations: write
+      id-token: write
+
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Log in to the docker hub Container registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker AuthService
+        id: authpush
+        uses: docker/build-push-action@v6
+        with:
+          context: SkyBooker/AuthService
+          file: SkyBooker/AuthService/Dockerfile 
+          push: true
+          tags: nelonissle7/kub_auth:latest
+
+      - name: Build and push Docker AuthService Migration
+        id: authmigrationpush
+        uses: docker/build-push-action@v6
+        with:
+          context: SkyBooker/AuthService
+          file: SkyBooker/AuthService/Dockerfile-migration
+          push: true
+          tags: nelonissle7/kub_authmigration:latest
+
+      - name: Build and push Docker Flight Service
+        id: flightpush
+        uses: docker/build-push-action@v6
+        with:
+          context: SkyBooker/FlightService
+          file: SkyBooker/FlightService/Dockerfile
+          push: true
+          tags: nelonissle7/kub_flight:latest
+      
+      - name: Build and push Docker Booking Service
+        id: bookingpush
+        uses: docker/build-push-action@v6
+        with:
+          context: SkyBooker/BookingService
+          file: SkyBooker/BookingService/Dockerfile
+          push: true
+          tags: nelonissle7/kub_booking:latest
+      
+      - name: Build and push Docker Booking Service Migration
+        id: bookingmigrationpush
+        uses: docker/build-push-action@v6
+        with:
+          context: SkyBooker/BookingService
+          file: SkyBooker/BookingService/Dockerfile-migration
+          push: true
+          tags: nelonissle7/kub_bookingmigration:latest
+    
+      - name: Build and push Docker Messaging Service
+        id: messagingpush
+        uses: docker/build-push-action@v6
+        with:
+          context: SkyBooker/MessagingService
+          file: SkyBooker/MessagingService/Dockerfile
+          push: true
+          tags: nelonissle7/kub_messaging:latest
+
+      - name: Build and push Docker Gateway Service
+        id: gatewaypush
+        uses: docker/build-push-action@v6
+        with:
+          context: SkyBooker/OcelotApiGateway
+          file: SkyBooker/OcelotApiGateway/Dockerfile
+          push: true
+          tags: nelonissle7/kub_gateway:latest

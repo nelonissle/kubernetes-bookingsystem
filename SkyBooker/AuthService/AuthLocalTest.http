@@ -1,0 +1,43 @@
+@AuthHService = http://localhost:8080
+@adminPwd = 'Default$Admin359_admin'
+@token = yourtoken_from_login
+
+### Login default admin user locally
+POST {{AuthHService}}/api/login
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username": "admin",
+  "password": "Default$Admin359_admin"
+}
+
+### Get all users as admin user, use token from above login
+GET {{AuthHService}}/api/admin/users
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+
+### Register User
+POST {{AuthHService}}/api/register
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username": "Test1",
+  "eMail": "test1@example.com",
+  "password": "ABCDEFG-ab123456",
+  "role": "Client"
+}
+
+
+### Login default admin user locally
+POST {{AuthHService}}/api/login
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username": "Test1",
+  "password": "ABCDEFG-ab123456"
+}
